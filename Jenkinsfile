@@ -1,33 +1,42 @@
 #!/usr/bin/groovy
 node{
 
-  def dependencyPipeline
-  def testProjectPipeline
-  def stagedDependencyProject
-  def stagedTestProject
-  def pipelineTestProjectPrId
+  def devopsPipeline
+  def forgePipeline
+  def stagedDevopsProject
+  def stagedForgeProject
+  def pipelineForgePrId
 
-  stage 'Stage pipeline-test-project-dependency'
-  git 'https://github.com/fabric8io/pipeline-test-project-dependency.git'
-  dependencyPipeline = load 'release.groovy'
-  stagedDependencyProject = dependencyPipeline.stage()
 
-  stage 'Stage pipeline-test-project'
-  git 'https://github.com/fabric8io/pipeline-test-project.git'
-  sh "git remote set-url origin git@github.com:fabric8io/pipeline-test-project.git"
-  testProjectPipeline = load 'release.groovy'
-  pipelineTestProjectPrId = testProjectPipeline.updateDependencies('https://oss.sonatype.org/content/repositories/staging/')
-  stagedTestProject = testProjectPipeline.stage()
+  git 'https://github.com/fabric8io/fabric8-devops.git'
+  sh "git remote set-url origin git@github.com:fabric8io/fabric8-devops.git"
+  devopsPipeline = load 'release.groovy'
+  stage 'Updating dependencies'
+  def devopsPipelinePrId = devopsPipeline.updateDependencies('http://central.maven.org/maven2/')
 
-  stage 'Deploy pipeline-test-project'
-  testProjectPipeline.deploy(stagedTestProject)
+  stage 'Stage fabric8-devops'
+  stagedDevopsProject = devopsPipeline.stage()
+
+  stage 'Stage fabric8-forge'
+  git 'https://github.com/fabric8io/fabric8-forge.git'
+  sh "git remote set-url origin git@github.com:fabric8io/fabric8-forge.git"
+  forgePipeline = load 'release.groovy'
+  pipelineForgePrId = forgePipeline.updateDependencies('https://oss.sonatype.org/content/repositories/staging/')
+  stagedForgeProject = forgePipeline.stage()
+
+  //stage 'Deploy pipeline-test-project'
+  //forgePipeline.deploy(stagedForgeProject)
 
   stage 'Approve release'
-  testProjectPipeline.approveRelease(stagedTestProject)
+  forgePipeline.approveRelease(stagedForgeProject)
 
   stage 'Promote release'
-  dependencyPipeline.release(stagedDependencyProject)
-  testProjectPipeline.release(stagedTestProject)
-  testProjectPipeline.mergePullRequest(pipelineTestProjectPrId)
-
+  devopsPipeline.release(stagedDevopsProject)
+  forgePipeline.release(stagedForgeProject)
+  if (devopsPipelinePrId != null){
+    devopsPipeline.mergePullRequest(devopsPipelinePrId)
+  }
+  if (pipelineForgePrId != null){
+    forgePipeline.mergePullRequest(pipelineForgePrId)
+  }
 }
