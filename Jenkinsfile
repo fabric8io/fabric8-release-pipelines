@@ -48,6 +48,17 @@ node{
     ipaasStagedProject = ipaasPipeline.stage()
   }
 
+  stage 'Update fabric8-devops deps'
+  ws ('devops'){
+    git 'https://github.com/fabric8io/fabric8-devops.git'
+    sh "git remote set-url origin git@github.com:fabric8io/fabric8-devops.git"
+    devopsPipeline = load 'release.groovy'
+    devopsUpdateDepsPrId = devopsPipeline.updateDependencies('https://oss.sonatype.org/content/repositories/staging/')
+
+    stage 'Stage fabric8-devops'
+    devopsStagedProject = devopsPipeline.stage()
+  }
+
   stage 'Update ipaas-quickstarts deps'
   ws ('quickstart'){
     git 'https://github.com/fabric8io/ipaas-quickstarts.git'
@@ -99,6 +110,14 @@ node{
     ipaasPipeline.release(ipaasStagedProject)
     if (ipaasUpdateDepsPrId != null){
       ipaasPipeline.mergePullRequest(ipaasUpdateDepsPrId)
+    }
+  }
+
+  stage 'Promote fabric8-devops'
+  ws ('devops'){
+    devopsPipeline.release(devopsStagedProject)
+    if (devopsUpdateDepsPrId != null){
+      devopsPipeline.mergePullRequest(devopsUpdateDepsPrId)
     }
   }
 
