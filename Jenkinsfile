@@ -8,7 +8,7 @@ node{
   def pipelineForgePrId
 
   stage 'Update ipaas-quickstarts deps'
-  ws {
+  ws ('quickstarts'){
     git 'https://github.com/fabric8io/ipaas-quickstarts.git'
     sh "git remote set-url origin git@github.com:fabric8io/ipaas-quickstarts.git"
     quickstartsPipeline = load 'release.groovy'
@@ -19,7 +19,7 @@ node{
   }
 
   stage 'Update fabric8-forge deps'
-  ws {
+  ws ('forge'){
     git 'https://github.com/fabric8io/fabric8-forge.git'
     sh "git remote set-url origin git@github.com:fabric8io/fabric8-forge.git"
     forgePipeline = load 'release.groovy'
@@ -32,11 +32,11 @@ node{
   //stage 'Deploy pipeline-test-project'
   //forgePipeline.deploy(stagedForgeProject)
 
-  stage 'Approve release'
+//  stage 'Approve release'
 //  forgePipeline.approveRelease(stagedForgeProject)
 
   stage 'Promote ipaas-quickstarts'
-  ws {
+  ws ('quickstarts'){
     quickstartsPipeline.release(stagedQuickstartsProject)
     if (quickstartsPipelinePrId != null){
       quickstartsPipeline.mergePullRequest(quickstartsPipelinePrId)
@@ -44,7 +44,7 @@ node{
   }
 
   stage 'Promote fabric8-forge'
-  ws{
+  ws ('forge'){
     forgePipeline.release(stagedForgeProject)
     if (pipelineForgePrId != null){
       forgePipeline.mergePullRequest(pipelineForgePrId)
