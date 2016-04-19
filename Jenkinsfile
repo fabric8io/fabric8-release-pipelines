@@ -1,21 +1,21 @@
 #!/usr/bin/groovy
 node{
 
-  def devopsPipeline
+  def quickstartsPipeline
   def forgePipeline
-  def stagedDevopsProject
+  def stagedQuickstartsProject
   def stagedForgeProject
   def pipelineForgePrId
 
-  stage 'Update fabric8-devops deps'
+  stage 'Update ipaas-quickstarts deps'
   ws {
-    git 'https://github.com/fabric8io/fabric8-devops.git'
-    sh "git remote set-url origin git@github.com:fabric8io/fabric8-devops.git"
-    devopsPipeline = load 'release.groovy'
-    def devopsPipelinePrId = devopsPipeline.updateDependencies('http://central.maven.org/maven2/')
+    git 'https://github.com/fabric8io/ipaas-quickstarts.git'
+    sh "git remote set-url origin git@github.com:fabric8io/ipaas-quickstarts.git"
+    quickstartsPipeline = load 'release.groovy'
+    def quickstartsPipelinePrId = quickstartsPipeline.updateDependencies('http://central.maven.org/maven2/')
 
-    stage 'Stage fabric8-devops'
-    stagedDevopsProject = devopsPipeline.stage()
+    stage 'Stage ipaas-quickstarts'
+    stagedQuickstartsProject = quickstartsPipeline.stage()
   }
 
   stage 'Update fabric8-forge deps'
@@ -35,15 +35,15 @@ node{
   stage 'Approve release'
   forgePipeline.approveRelease(stagedForgeProject)
 
-  stage 'Promote fabric8-devops'
+  stage 'Promote ipaas-quickstarts'
   ws {
-    devopsPipeline.release(stagedDevopsProject)
-    if (devopsPipelinePrId != null){
-      devopsPipeline.mergePullRequest(devopsPipelinePrId)
+    quickstartsPipeline.release(stagedQuickstartsProject)
+    if (quickstartsPipelinePrId != null){
+      quickstartsPipeline.mergePullRequest(quickstartsPipelinePrId)
     }
   }
 
-  stage 'Promote fabric8-devops'
+  stage 'Promote fabric8-forge'
   ws{
     forgePipeline.release(stagedForgeProject)
     if (pipelineForgePrId != null){
