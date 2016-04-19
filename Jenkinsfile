@@ -33,7 +33,7 @@ node{
   //forgePipeline.deploy(stagedForgeProject)
 
   stage 'Approve release'
-  forgePipeline.approveRelease(stagedForgeProject)
+//  forgePipeline.approveRelease(stagedForgeProject)
 
   stage 'Promote ipaas-quickstarts'
   ws {
