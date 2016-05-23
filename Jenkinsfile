@@ -91,8 +91,9 @@ node{
     stage 'Stage fabric8-console'
     consoleStagedProject = consolePipeline.stage()
   }
-  //stage 'Deploy pipeline-test-project'
-  //forgePipeline.deploy(stagedForgeProject)
+
+  stage 'Deploy'
+  consolePipeline.deploy(OPENSHIFT_URL, OPENSHIFT_DOMAIN, KUBERNETES_URL, KUBERNETES_DEFAULT_NAMESPACE, OPENSHIFT_STAGING_DOCKER_REGISTRY_URL, KUBERNETES_STAGING_DOCKER_REGISTRY_URL)
 
   stage 'Approve release'
   forgePipeline.approveRelease(forgeStagedProject)
