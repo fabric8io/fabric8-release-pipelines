@@ -1,10 +1,6 @@
 #!/usr/bin/groovy
 node{
 
-  def fabric8Pipeline
-  def fabric8UpdateDepsPrId
-  def fabric8StagedProject
-
   def ipaasPipeline
   def ipaasUpdateDepsPrId
   def ipaasStagedProject
@@ -24,18 +20,6 @@ node{
   def consolePipeline
   def consoleUpdateDepsPrId
   def consoleStagedProject
-
-
-  stage 'Update fabric8 deps'
-  ws ('fabric8'){
-    git 'https://github.com/fabric8io/fabric8.git'
-    sh "git remote set-url origin git@github.com:fabric8io/fabric8.git"
-    fabric8Pipeline = load 'release.groovy'
-    fabric8UpdateDepsPrId = fabric8Pipeline.updateDependencies('http://central.maven.org/maven2/')
-
-    stage 'Stage fabric8'
-    fabric8StagedProject = fabric8Pipeline.stage()
-  }
 
   stage 'Update fabric8-ipaas deps'
   ws ('ipaas'){
@@ -97,14 +81,6 @@ node{
 
   stage 'Approve release'
   forgePipeline.approveRelease(forgeStagedProject)
-
-  stage 'Promote fabric8'
-  ws ('fabric8'){
-    fabric8Pipeline.release(fabric8StagedProject)
-    if (fabric8UpdateDepsPrId != null){
-      fabric8Pipeline.mergePullRequest(fabric8UpdateDepsPrId)
-    }
-  }
 
   stage 'Promote fabric8-ipaas'
   ws ('ipaas'){
