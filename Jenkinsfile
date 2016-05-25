@@ -1,6 +1,7 @@
 #!/usr/bin/groovy
 try {
   node{
+    hubot room: 'release', message: "${env.JOB_NAME} release started"
 
     def ipaasPipeline
     def ipaasUpdateDepsPrId
