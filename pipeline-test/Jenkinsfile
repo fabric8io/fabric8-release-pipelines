@@ -33,6 +33,7 @@ try {
     testProjectPipeline.mergePullRequest(pipelineTestProjectPrId)
 
   }
+  hubot room: 'release', message: "${env.JOB_NAME} release successful"
 } catch (err){
   hubot room: 'release', message: "${env.JOB_NAME} release failed ${err}"
   currentBuild.result = 'FAILURE'
