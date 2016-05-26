@@ -8,13 +8,14 @@ try {
     def stagedQuickstartsProject
     def stagedForgeProject
     def pipelineForgePrId
+    def quickstartsPipelinePrId
 
     stage 'Update ipaas-quickstarts deps'
     ws ('quickstarts'){
       git 'https://github.com/fabric8io/ipaas-quickstarts.git'
       sh "git remote set-url origin git@github.com:fabric8io/ipaas-quickstarts.git"
       quickstartsPipeline = load 'release.groovy'
-      def quickstartsPipelinePrId = quickstartsPipeline.updateDependencies('http://central.maven.org/maven2/')
+      quickstartsPipelinePrId = quickstartsPipeline.updateDependencies('http://central.maven.org/maven2/')
 
       stage 'Stage ipaas-quickstarts'
       stagedQuickstartsProject = quickstartsPipeline.stage()
