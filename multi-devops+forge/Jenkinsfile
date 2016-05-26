@@ -32,27 +32,28 @@ try {
       stagedForgeProject = forgePipeline.stage()
     }
 
-    //stage 'Deploy pipeline-test-project'
-    //forgePipeline.deploy(stagedForgeProject)
-
     stage 'Approve release'
     forgePipeline.approveRelease(stagedForgeProject)
 
-    stage 'Promote fabric8-devops'
-    ws ('devops'){
-      devopsPipeline.release(stagedDevopsProject)
-      if (devopsPipelinePrId != null){
-        devopsPipeline.mergePullRequest(devopsPipelinePrId)
+    stage 'Promote'
+    parallel(
+      devops: {
+        ws ('devops'){
+          devopsPipeline.release(stagedDevopsProject)
+          if (devopsPipelinePrId != null){
+            devopsPipeline.mergePullRequest(devopsPipelinePrId)
+          }
+        }
+      },
+      forge:{
+        ws ('forge'){
+          forgePipeline.release(stagedForgeProject)
+          if (pipelineForgePrId != null){
+            forgePipeline.mergePullRequest(pipelineForgePrId)
+          }
+        }
       }
-    }
-
-    stage 'Promote fabric8-forge'
-    ws ('forge'){
-      forgePipeline.release(stagedForgeProject)
-      if (pipelineForgePrId != null){
-        forgePipeline.mergePullRequest(pipelineForgePrId)
-      }
-    }
+    )
   }
   hubot room: 'release', message: "${env.JOB_NAME} release successful"
 } catch (err){

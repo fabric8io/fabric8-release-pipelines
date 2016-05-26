@@ -112,53 +112,63 @@ try {
       throw err
     }
 
-    stage 'Promote fabric8'
-    ws ('fabric8'){
-      fabric8Pipeline.release(fabric8StagedProject)
-      if (fabric8UpdateDepsPrId != null){
-        fabric8Pipeline.mergePullRequest(fabric8UpdateDepsPrId)
-      }
-    }
+    stage 'Promote'
 
-    stage 'Promote fabric8-ipaas'
-    ws ('ipaas'){
-      ipaasPipeline.release(ipaasStagedProject)
-      if (ipaasUpdateDepsPrId != null){
-        ipaasPipeline.mergePullRequest(ipaasUpdateDepsPrId)
+    parallel(
+      fabric8: {
+        ws ('fabric8'){
+          fabric8Pipeline.release(fabric8StagedProject)
+          if (fabric8UpdateDepsPrId != null){
+            fabric8Pipeline.mergePullRequest(fabric8UpdateDepsPrId)
+          }
+        }
+      },
+      ipaas:{
+        ws ('ipaas'){
+          ipaasPipeline.release(ipaasStagedProject)
+          if (ipaasUpdateDepsPrId != null){
+            ipaasPipeline.mergePullRequest(ipaasUpdateDepsPrId)
+          }
+        }
+      },
+      devops:{
+        ws ('devops'){
+          devopsPipeline.release(devopsStagedProject)
+          if (devopsUpdateDepsPrId != null){
+            devopsPipeline.mergePullRequest(devopsUpdateDepsPrId)
+          }
+        }
       }
-    }
+    )
 
-    stage 'Promote fabric8-devops'
-    ws ('devops'){
-      devopsPipeline.release(devopsStagedProject)
-      if (devopsUpdateDepsPrId != null){
-        devopsPipeline.mergePullRequest(devopsUpdateDepsPrId)
-      }
-    }
 
-    stage 'Promote ipaas-quickstarts'
-    ws ('quickstarts'){
-      quickstartsPipeline.release(quickstartsStagedProject)
-      if (quickstartsUpdateDepsPrId != null){
-        quickstartsPipeline.mergePullRequest(quickstartsUpdateDepsPrId)
+    parallel(
+      quickstarts: {
+        ws ('quickstarts'){
+          quickstartsPipeline.release(quickstartsStagedProject)
+          if (quickstartsUpdateDepsPrId != null){
+            quickstartsPipeline.mergePullRequest(quickstartsUpdateDepsPrId)
+          }
+        }
+      },
+      forge:{
+        ws ('forge'){
+          forgePipeline.release(forgeStagedProject)
+          if (forgeUpdateDepsPrId != null){
+            forgePipeline.mergePullRequest(forgeUpdateDepsPrId)
+          }
+        }
+      },
+      console:{
+        ws ('console'){
+          consolePipeline.release(consoleStagedProject)
+          if (consoleUpdateDepsPrId != null){
+            consolePipeline.mergePullRequest(consoleUpdateDepsPrId)
+          }
+        }
       }
-    }
+    )
 
-    stage 'Promote fabric8-forge'
-    ws ('forge'){
-      forgePipeline.release(forgeStagedProject)
-      if (forgeUpdateDepsPrId != null){
-        forgePipeline.mergePullRequest(forgeUpdateDepsPrId)
-      }
-    }
-
-    stage 'Promote fabric8-console'
-    ws ('console'){
-      consolePipeline.release(consoleStagedProject)
-      if (consoleUpdateDepsPrId != null){
-        consolePipeline.mergePullRequest(consoleUpdateDepsPrId)
-      }
-    }
   }
   hubot room: 'release', message: "${env.JOB_NAME} release successful"
 } catch (err){
