@@ -38,18 +38,22 @@ try {
     stage 'Promote'
     parallel(
       devops: {
-        ws ('devops'){
-          devopsPipeline.release(stagedDevopsProject)
-          if (devopsPipelinePrId != null){
-            devopsPipeline.mergePullRequest(devopsPipelinePrId)
+        node {
+          ws ('devops'){
+            devopsPipeline.release(stagedDevopsProject)
+            if (devopsPipelinePrId != null){
+              devopsPipeline.mergePullRequest(devopsPipelinePrId)
+            }
           }
         }
       },
       forge:{
-        ws ('forge'){
-          forgePipeline.release(stagedForgeProject)
-          if (pipelineForgePrId != null){
-            forgePipeline.mergePullRequest(pipelineForgePrId)
+        node{
+          ws ('forge'){
+            forgePipeline.release(stagedForgeProject)
+            if (pipelineForgePrId != null){
+              forgePipeline.mergePullRequest(pipelineForgePrId)
+            }
           }
         }
       }

@@ -116,26 +116,32 @@ try {
 
     parallel(
       fabric8: {
-        ws ('fabric8'){
-          fabric8Pipeline.release(fabric8StagedProject)
-          if (fabric8UpdateDepsPrId != null){
-            fabric8Pipeline.mergePullRequest(fabric8UpdateDepsPrId)
+        node {
+          ws ('fabric8'){
+            fabric8Pipeline.release(fabric8StagedProject)
+            if (fabric8UpdateDepsPrId != null){
+              fabric8Pipeline.mergePullRequest(fabric8UpdateDepsPrId)
+            }
           }
         }
       },
       ipaas:{
-        ws ('ipaas'){
-          ipaasPipeline.release(ipaasStagedProject)
-          if (ipaasUpdateDepsPrId != null){
-            ipaasPipeline.mergePullRequest(ipaasUpdateDepsPrId)
+        node {
+          ws ('ipaas'){
+            ipaasPipeline.release(ipaasStagedProject)
+            if (ipaasUpdateDepsPrId != null){
+              ipaasPipeline.mergePullRequest(ipaasUpdateDepsPrId)
+            }
           }
         }
       },
       devops:{
-        ws ('devops'){
-          devopsPipeline.release(devopsStagedProject)
-          if (devopsUpdateDepsPrId != null){
-            devopsPipeline.mergePullRequest(devopsUpdateDepsPrId)
+        node {
+          ws ('devops'){
+            devopsPipeline.release(devopsStagedProject)
+            if (devopsUpdateDepsPrId != null){
+              devopsPipeline.mergePullRequest(devopsUpdateDepsPrId)
+            }
           }
         }
       }
@@ -144,26 +150,32 @@ try {
 
     parallel(
       quickstarts: {
-        ws ('quickstarts'){
-          quickstartsPipeline.release(quickstartsStagedProject)
-          if (quickstartsUpdateDepsPrId != null){
-            quickstartsPipeline.mergePullRequest(quickstartsUpdateDepsPrId)
+        node {
+          ws ('quickstarts'){
+            quickstartsPipeline.release(quickstartsStagedProject)
+            if (quickstartsUpdateDepsPrId != null){
+              quickstartsPipeline.mergePullRequest(quickstartsUpdateDepsPrId)
+            }
           }
         }
       },
       forge:{
-        ws ('forge'){
-          forgePipeline.release(forgeStagedProject)
-          if (forgeUpdateDepsPrId != null){
-            forgePipeline.mergePullRequest(forgeUpdateDepsPrId)
+        node {
+          ws ('forge'){
+            forgePipeline.release(forgeStagedProject)
+            if (forgeUpdateDepsPrId != null){
+              forgePipeline.mergePullRequest(forgeUpdateDepsPrId)
+            }
           }
         }
       },
       console:{
-        ws ('console'){
-          consolePipeline.release(consoleStagedProject)
-          if (consoleUpdateDepsPrId != null){
-            consolePipeline.mergePullRequest(consoleUpdateDepsPrId)
+        node {
+          ws ('console'){
+            consolePipeline.release(consoleStagedProject)
+            if (consoleUpdateDepsPrId != null){
+              consolePipeline.mergePullRequest(consoleUpdateDepsPrId)
+            }
           }
         }
       }
