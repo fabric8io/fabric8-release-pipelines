@@ -4,21 +4,22 @@ try {
     hubot room: 'release', message: "${env.JOB_NAME} release started"
 
     def quickstartsPipeline
+    def quickstartsUpdateDepsPrId
+    def quickstartsStagedProject
+
     def forgePipeline
-    def stagedQuickstartsProject
-    def stagedForgeProject
-    def pipelineForgePrId
-    def quickstartsPipelinePrId
+    def forgeUpdateDepsPrId
+    def forgeStagedProject
 
     stage 'Update ipaas-quickstarts deps'
-    ws ('quickstarts'){
+    ws ('quickstart'){
       git 'https://github.com/fabric8io/ipaas-quickstarts.git'
       sh "git remote set-url origin git@github.com:fabric8io/ipaas-quickstarts.git"
       quickstartsPipeline = load 'release.groovy'
-      quickstartsPipelinePrId = quickstartsPipeline.updateDependencies('http://central.maven.org/maven2/')
+      quickstartsUpdateDepsPrId = quickstartsPipeline.updateDependencies('https://oss.sonatype.org/content/repositories/staging/')
 
       stage 'Stage ipaas-quickstarts'
-      stagedQuickstartsProject = quickstartsPipeline.stage()
+      quickstartsStagedProject = quickstartsPipeline.stage()
     }
 
     stage 'Update fabric8-forge deps'
@@ -26,27 +27,52 @@ try {
       git 'https://github.com/fabric8io/fabric8-forge.git'
       sh "git remote set-url origin git@github.com:fabric8io/fabric8-forge.git"
       forgePipeline = load 'release.groovy'
-      pipelineForgePrId = forgePipeline.updateDependencies('https://oss.sonatype.org/content/repositories/staging/')
+      forgeUpdateDepsPrId = forgePipeline.updateDependencies('https://oss.sonatype.org/content/repositories/staging/')
 
       stage 'Stage fabric8-forge'
-      stagedForgeProject = forgePipeline.stage()
+      forgeStagedProject = forgePipeline.stage()
     }
 
-    stage 'Promote ipaas-quickstarts'
-    ws ('quickstarts'){
-      quickstartsPipeline.release(stagedQuickstartsProject)
-      if (quickstartsPipelinePrId != null){
-        quickstartsPipeline.mergePullRequest(quickstartsPipelinePrId)
-      }
-    }
+    //stage 'Deploy'
+    //consolePipeline.deploy(OPENSHIFT_URL, OPENSHIFT_DOMAIN, KUBERNETES_URL, KUBERNETES_DEFAULT_NAMESPACE, OPENSHIFT_STAGING_DOCKER_REGISTRY_URL, KUBERNETES_STAGING_DOCKER_REGISTRY_URL)
 
-    stage 'Promote fabric8-forge'
-    ws ('forge'){
-      forgePipeline.release(stagedForgeProject)
-      if (pipelineForgePrId != null){
-        forgePipeline.mergePullRequest(pipelineForgePrId)
+    // stage 'Approve release'
+    // try {
+    //   forgePipeline.approveRelease(forgeStagedProject)
+    // } catch (err) {
+    //
+    //   // fabric8Pipeline.drop(devopsStagedProject, devopsUpdateDepsPrId)
+    //   // quickstartsPipeline.drop(quickstartsStagedProject, quickstartsUpdateDepsPrId)
+    //   // forgePipeline.drop(forgeStagedProject, forgeUpdateDepsPrId)
+    //
+    //   throw err
+    // }
+    //
+    // stage 'Promote'
+
+    parallel(
+      quickstarts: {
+        node {
+          ws ('quickstarts'){
+            quickstartsPipeline.release(quickstartsStagedProject)
+            if (quickstartsUpdateDepsPrId != null){
+              quickstartsPipeline.mergePullRequest(quickstartsUpdateDepsPrId)
+            }
+          }
+        }
+      },
+      forge:{
+        node {
+          ws ('forge'){
+            forgePipeline.release(forgeStagedProject)
+            if (forgeUpdateDepsPrId != null){
+              forgePipeline.mergePullRequest(forgeUpdateDepsPrId)
+            }
+          }
+        }
       }
-    }
+    )
+
   }
   hubot room: 'release', message: "${env.JOB_NAME} release successful"
 } catch (err){
