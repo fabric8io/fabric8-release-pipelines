@@ -6,43 +6,43 @@ try {
     ws ('devops'){
       git 'https://github.com/fabric8io/fabric8-devops.git'
       sh "git remote set-url origin git@github.com:fabric8io/fabric8-devops.git"
-      def devopsPipeline = load 'release.groovy'
+      def p = load 'release.groovy'
 
       stage 'Stage fabric8-devops'
-      def stagedDevopsProject = devopsPipeline.stage()
+      def prj = p.stage()
 
       stage 'Promote'
-      devopsPipeline.release(stagedDevopsProject)
+      p.release(prj)
 
       stage 'Update downstream dependencies'
-      devopsPipeline.updateDownstreamDependencies(stagedDevopsProject)
+      p.updateDownstreamDependencies(prj)
     }
-
+    
     ws ('ipaas'){
       git 'https://github.com/fabric8io/fabric8-ipaas.git'
       sh "git remote set-url origin git@github.com:fabric8io/fabric8-ipaas.git"
-      def ipaasPipeline = load 'release.groovy'
+      def p = load 'release.groovy'
 
       stage 'Stage fabric8-ipaas'
-      def stagedIpaasProject = ipaasPipeline.stage()
+      def prj = p.stage()
 
       stage 'Promote'
-      ipaasPipeline.release(stagedIpaasProject)
+      p.release(prj)
 
       stage 'Update downstream dependencies'
-      ipaasPipeline.updateDownstreamDependencies(stagedIpaasProject)
+      p.updateDownstreamDependencies(prj)
     }
 
     ws ('fabric8-platform'){
       git 'https://github.com/fabric8io/fabric8-platform.git'
       sh "git remote set-url origin git@github.com:fabric8io/fabric8-platform.git"
-      def platformPipeline = load 'release.groovy'
+      def p = load 'release.groovy'
 
       stage 'Stage fabric8-platform'
-      def stagedPipelineProject = platformPipeline.stage()
+      def prj = p.stage()
 
       stage 'Promote fabric8-platform'
-      platformPipeline.release(stagedPipelineProject)
+      p.release(prj)
     }
   }
   hubot room: 'release', message: "${env.JOB_NAME} release successful"

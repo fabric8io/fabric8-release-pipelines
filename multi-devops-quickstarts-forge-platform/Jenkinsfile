@@ -18,6 +18,37 @@ try {
       p.updateDownstreamDependencies(prj)
     }
 
+    ws ('quickstarts'){
+      git 'https://github.com/fabric8io/ipaas-quickstart.git'
+      sh "git remote set-url origin git@github.com:fabric8io/ipaas-quickstart.git"
+      def p = load 'release.groovy'
+
+      stage 'Stage ipaas-quickstart'
+      def prj = p.stage()
+
+      stage 'Promote'
+      p.release(prj)
+
+      stage 'Update downstream dependencies'
+      p.updateDownstreamDependencies(prj)
+    }
+
+    ws ('forge'){
+      git 'https://github.com/fabric8io/fabric8-forge.git'
+      sh "git remote set-url origin git@github.com:fabric8io/fabric8-forge.git"
+      def p = load 'release.groovy'
+
+      stage 'Stage fabric8-forge'
+      def prj = p.stage()
+
+      stage 'Promote'
+      p.release(prj)
+
+      stage 'Update downstream dependencies'
+      p.updateDownstreamDependencies(prj)
+    }
+
+
     ws ('fabric8-platform'){
       git 'https://github.com/fabric8io/fabric8-platform.git'
       sh "git remote set-url origin git@github.com:fabric8io/fabric8-platform.git"
