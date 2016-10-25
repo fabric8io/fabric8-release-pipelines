@@ -1,0 +1,37 @@
+#!/usr/bin/groovy
+try {
+  node{
+    hubot room: 'release', message: "${env.JOB_NAME} release started"
+
+    ws ('devops'){
+      git 'https://github.com/fabric8io/fabric8-devops.git'
+      sh "git remote set-url origin git@github.com:fabric8io/fabric8-devops.git"
+      def devopsPipeline = load 'release.groovy'
+
+      stage 'Stage fabric8-devops'
+      def stagedDevopsProject = devopsPipeline.stage()
+
+      stage 'Promote'
+      devopsPipeline.release(stagedDevopsProject)
+
+      stage 'Update downstream dependencies'
+      devopsPipeline.updateDownstreamDependencies(stagedDevopsProject)
+    }
+
+    ws ('fabric8-platform'){
+      git 'https://github.com/fabric8io/fabric8-platform.git'
+      sh "git remote set-url origin git@github.com:fabric8io/fabric8-platform.git"
+      def platformPipeline = load 'release.groovy'
+
+      stage 'Stage fabric8-platform'
+      def stagedPipelineProject = platformPipeline.stage()
+
+      stage 'Promote fabric8-platform'
+      platformPipeline.release(stagedPipelineProject)
+    }
+  }
+  hubot room: 'release', message: "${env.JOB_NAME} release successful"
+} catch (err){
+  hubot room: 'release', message: "${env.JOB_NAME} release failed ${err}"
+  currentBuild.result = 'FAILURE'
+}
