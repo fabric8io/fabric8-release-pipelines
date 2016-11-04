@@ -20,7 +20,7 @@ try {
     }
 
     if ("true".equals(IPAAS_QUICKSTARTS)) {
-      releaseit('ipaas-quickstart')
+      releaseit('ipaas-quickstarts')
     }
 
     if ("true".equals(FABRIC8_FORGE)) {
