@@ -3,31 +3,31 @@ try {
   node{
     hubot room: 'release', message: "${env.JOB_NAME} release started"
 
-    if (FABRIC8) {
+    if ("true".equals(FABRIC8)) {
       releaseit('fabric8')
     }
 
-    if (FABRIC8_MAVEN_PLUGIN) {
+    if ("true".equals(FABRIC8_MAVEN_PLUGIN)) {
       releaseit('fabric8-maven-plugin')
     }
 
-    if (FABRIC8_DEVOPS) {
+    if ("true".equals(FABRIC8_DEVOPS)) {
       releaseit('fabric8-devops')
     }
 
-    if (FABRIC8_IPAAS) {
+    if ("true".equals(FABRIC8_IPAAS)) {
       releaseit('fabric8-ipaas')
     }
 
-    if (IPAAS_QUICKSTARTS) {
+    if ("true".equals(IPAAS_QUICKSTARTS)) {
       releaseit('ipaas-quickstart')
     }
 
-    if (FABRIC8_FORGE) {
+    if ("true".equals(FABRIC8_FORGE)) {
       releaseit('fabric8-forge')
     }
 
-    if (FABRIC8_PLATFORM) {
+    if ("true".equals(FABRIC8_PLATFORM)) {
       releaseit('fabric8-platform')
     }
   }
