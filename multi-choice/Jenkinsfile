@@ -47,12 +47,12 @@ def releaseit (name){
     stage "Stage ${name}"
     def prj = p.stage()
 
-    stage 'Promote'
-    p.release(prj)
-
     if (name == 'fabric8-platform'){
       p.approve(prj)
     }
+
+    stage 'Promote'
+    p.release(prj)
 
     stage 'Update downstream dependencies'
     p.updateDownstreamDependencies(prj)
