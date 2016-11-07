@@ -27,9 +27,8 @@ try {
       releaseit('fabric8-forge')
     }
 
-    if ("true".equals(FABRIC8_PLATFORM)) {
-      releaseit('fabric8-platform')
-    }
+    releaseit('fabric8-platform')
+
   }
   hubot room: 'release', message: "${env.JOB_NAME} release successful"
 } catch (err){
