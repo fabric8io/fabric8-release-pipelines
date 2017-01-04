@@ -1,6 +1,8 @@
 #!/usr/bin/groovy
+@Library('github.com/fabric8io/fabric8-pipeline-library@master')
 try {
-  node{
+mavenNode {
+  dockerNode {
     hubot room: 'release', message: "${env.JOB_NAME} release started"
 
     if ("true".equals(FABRIC8)) {
@@ -30,6 +32,7 @@ try {
     releaseit('fabric8-platform')
 
   }
+}
   hubot room: 'release', message: "${env.JOB_NAME} release successful"
 } catch (err){
   hubot room: 'release', message: "${env.JOB_NAME} release failed ${err}"
