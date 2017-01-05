@@ -1,0 +1,8 @@
+#!/usr/bin/groovy
+@Library('github.com/rawlingsj/fabric8-pipeline-library@master')
+def dummy
+mavenNode {
+    container(name: 'clients') {
+        sh 'rm -rf io/fabric8/funktion/connector/'
+    }
+}
