@@ -11,7 +11,7 @@ clientsNode {
     def repos = getRepos(org)
 
     for (repo in repos) {
-          def apiUrl = new URL("https://api.github.com/repos/${org}/${repo}/branches")
+          def apiUrl = new URL("https://api.github.com/repos/${org}/${repo}/branches?per_page=1000")
 
           def rsList = restGetURL{
               authString = githubToken
@@ -47,4 +47,3 @@ def getRepos(String organisation){
     repos = null
     return list
 }
-
