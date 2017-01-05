@@ -1,9 +1,6 @@
 #!/usr/bin/groovy
-@Library('github.com/fabric8io/fabric8-pipeline-library@master')
-def dummy
 try {
-mavenNode {
-  dockerNode {
+  node{
     hubot room: 'release', message: "${env.JOB_NAME} release started"
 
     if ("true".equals(FABRIC8)) {
@@ -22,6 +19,8 @@ mavenNode {
       releaseit('fabric8-ipaas')
     }
 
+    updateQuickstartDependencies()
+
     if ("true".equals(IPAAS_QUICKSTARTS)) {
       releaseit('ipaas-quickstarts')
     }
@@ -33,7 +32,6 @@ mavenNode {
     releaseit('fabric8-platform')
 
   }
-}
   hubot room: 'release', message: "${env.JOB_NAME} release successful"
 } catch (err){
   hubot room: 'release', message: "${env.JOB_NAME} release failed ${err}"
@@ -61,6 +59,16 @@ def releaseit (name){
     if (name != 'fabric8-platform'){
       stage 'Update downstream dependencies'
       p.updateDownstreamDependencies(prj)
+    }
+  }
+}
+
+def updateQuickstartDependencies(){
+  ws ('updates'){
+    git 'https://github.com/fabric8io/fabric8-maven-dependencies.git'
+
+    mavenUpdateOrganisationDependencies{
+      organisation = 'fabric8-quickstarts'
     }
   }
 }
