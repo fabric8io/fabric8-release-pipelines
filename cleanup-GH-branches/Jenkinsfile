@@ -1,0 +1,50 @@
+#!/usr/bin/groovy
+import com.cloudbees.groovy.cps.NonCPS
+import groovy.json.JsonSlurper;
+@Library('github.com/rawlingsj/fabric8-pipeline-library@master')
+def dummy
+clientsNode {
+    def flow = new io.fabric8.Fabric8Commands()
+    def githubToken = flow.getGitHubToken()
+
+    def org = 'fabric8-quickstarts'
+    def repos = getRepos(org)
+
+    for (repo in repos) {
+          def apiUrl = new URL("https://api.github.com/repos/${org}/${repo}/branches")
+
+          def rsList = restGetURL{
+              authString = githubToken
+              url = apiUrl
+          }
+          def branchName
+          for (rs in rsList) {
+               branchName = rs.name
+               if (branchName.startsWith('versionUpdate')){
+                  echo "Deleting ${branchName}"
+
+                  deleteGitHubBranch{
+                       authString = githubToken
+                       branch = branchName
+                       project = "${org}/${repo}"
+                  }
+               }
+          }
+    }
+}
+
+
+@NonCPS
+def getRepos(String organisation){
+    repoApi = new URL("https://api.github.com/orgs/${organisation}/repos?per_page=100")
+    repos = new JsonSlurper().parse(repoApi.newReader())
+
+    def list = []
+    for (repoData in repos) {
+        println "project to process ${organisation}/${repoData.name}"
+        list << repoData.name
+    }
+    repos = null
+    return list
+}
+
