@@ -16,15 +16,15 @@ try {
 
       if ("true".equals(FABRIC8_DEVOPS)) {
         releaseit('fabric8-devops')
+        tagSharedPipelineLibrary()
       }
 
       if ("true".equals(FABRIC8_IPAAS)) {
         releaseit('fabric8-ipaas')
       }
 
-      updateQuickstartDependencies()
-
       if ("true".equals(IPAAS_QUICKSTARTS)) {
+        updateQuickstartDependencies()
         releaseit('ipaas-quickstarts')
       }
 
@@ -74,5 +74,15 @@ def updateQuickstartDependencies(){
     mavenUpdateOrganisationDependencies{
       organisation = 'fabric8-quickstarts'
     }
+  }
+}
+
+def tagSharedPipelineLibrary(){
+  ws ('library'){
+    git 'https://github.com/fabric8io/fabric8-pipeline-library.git'
+
+    def pipeline = load 'release.groovy'
+    stage 'tag library'
+    pipeline.tagDownstreamRepos()()
   }
 }
