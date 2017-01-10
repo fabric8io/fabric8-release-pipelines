@@ -16,9 +16,8 @@ try {
 
       if ("true".equals(FABRIC8_DEVOPS)) {
         releaseit('fabric8-devops')
-
+        tagSharedPipelineLibrary()
       }
-      tagSharedPipelineLibrary()
 
       if ("true".equals(FABRIC8_IPAAS)) {
         releaseit('fabric8-ipaas')
