@@ -16,8 +16,9 @@ try {
 
       if ("true".equals(FABRIC8_DEVOPS)) {
         releaseit('fabric8-devops')
-        tagSharedPipelineLibrary()
+
       }
+      tagSharedPipelineLibrary()
 
       if ("true".equals(FABRIC8_IPAAS)) {
         releaseit('fabric8-ipaas')
@@ -81,8 +82,8 @@ def tagSharedPipelineLibrary(){
   ws ('library'){
     git 'https://github.com/fabric8io/fabric8-pipeline-library.git'
 
-    def pipeline = load 'release.groovy'
+    def p = load 'release.groovy'
     stage 'tag library'
-    pipeline.tagDownstreamRepos()()
+    p.tagDownstreamRepos()
   }
 }
