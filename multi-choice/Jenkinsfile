@@ -54,6 +54,12 @@ def releaseit (name){
     def prj = p.stage()
 
     if (name == 'fabric8-platform'){
+      stage 'Deploy and run system tests'
+      def yaml = readFile file: "packages/fabric8-platform/target/classes/META-INF/fabric8/kubernetes.yml"
+      fabric8SystemTests {
+          packageYAML = yaml
+      }
+      stage 'Approve'
       p.approve(prj)
     }
 
